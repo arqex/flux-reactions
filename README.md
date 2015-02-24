@@ -6,3 +6,89 @@ Using events, a dispatcher is not needed anymore to create an app that follows a
 Since events are available in every browser, react.js components don't need to be attached to any library method to communicate with the rest of the page, that makes components 100% encapsulated and reusable.
 
 *Flux-Reactions* is just an utility to reduce the boilerplate of dispatch custom events cross-browser, not a complete Flux implementation.
+
+See [A better Flux with DOM events](http://arqex.com/1028/better-flux-dom-events) to know the benefits of this approach.
+
+## Install
+*Flux-reactions* comes in the shape of a UMD module to be used in Node.js and the browser. It is possible to install it using npm
+```
+npm install flux-reactions
+```
+Using bower
+```
+bower install flux-reactions
+```
+Or adding it directly to your page code for development [flux-reactions.js](https://raw.githubusercontent.com/arqex/flux-reactions/master/flux-reactions.js)(5KB), and minified [flux-reactions.min.js](https://raw.githubusercontent.com/arqex/flux-reactions/master/flux-reactions.min.js)(1KB).
+
+## Use
+*Flux-reactions* comes with a mixin for React.js modules that allows to emit events easily using the `trigger` method. Let's create a counter component that emit an `increment` event whenever its button is clicked.
+```js
+var Counter  = React.createClass({
+    // Add the reaction mixin
+    mixin: [Reactions.mixin],
+    render: function(){
+        return (
+            <div className="counter">
+                <span>{this.props.count}</span>
+                <button onClick={ this.onIncrease }>Increase</button>
+            </div>
+        );
+    },
+    onIncrease: function(){
+        // Emit an increase event with 1 as detail
+        this.trigger('increase', 1);
+    }
+});
+```
+To create a reaction to the event, we can use the Reaction object as a hub.
+```
+Reactions.on( 'increase', function( e ){
+    // Add the number passed as detail to the 
+    // counter store ( 1 in this example)
+    store.counter += e.detail;
+});
+```
+
+The mixin also allow to listen to events emited by children components. Imagine a selectable list:
+```js
+var List = React.createClass({
+    mixin:[Reactions.mixin],
+    // Events to listen are defined in the onEvents attribute
+    onEvents: {
+        // Add a listener to the selected event
+        selected: function(e){
+            // Select the item that emitted the event
+            this.setState({selected: e.detail});
+        }
+    },
+    getInitialState: function(){
+        return {selected: -1};
+    },
+    render: function(){
+        // Create a list of 3 items
+        var items = [0,1,2].map( function( i ){
+            return <Item text={ 'Item ' + i} index={ i } selected={ this.state.selected == i} />;
+        });
+        return <div>{ items }</div>;
+    }
+});
+var Item = React.createClass({
+    mixin:[Reactions.mixin],
+    render: function(){
+        return (
+            // thenTrigger will emit a selected event on click
+            <div onClick={ this.thenTrigger( 'selected', this.props.index ) }>
+                { this.props.text }
+            </div>
+        );
+    }
+})
+```
+
+## Collaborate
+This is a quick implementation of a crossbrowser event library to be used with React.js. There are some directions to work to:
+* Add support for using EventEmitter make it work in the server.
+* Study the alternatives to make it work with the future [React Native](https://code.facebook.com/videos/786462671439502/react-js-conf-2015-keynote-introducing-react-native-/).
+* Add support for using it as a [higher order component](https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775).
+
+Any improvement that you may find is welcome.

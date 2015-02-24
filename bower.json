@@ -1,0 +1,23 @@
+{
+  "name": "flux-reactions",
+  "main": "flux-reactions.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/arqex/flux-reactions",
+  "authors": [
+    "marquex"
+  ],
+  "description": "An event driven Flux implementation.",
+  "keywords": [
+    "Flux",
+    "React",
+    "Events"
+  ],
+  "license": "GNU-v2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
