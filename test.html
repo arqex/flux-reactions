@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="http://fb.me/react-with-addons-0.12.2.min.js"></script>
+	<script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
+	<script src="flux-reactions.js"></script>
+</head>
+<body>
+<script type="text/jsx">
+	var Parent = React.createClass({
+		mixins: [ Reactions.mixin ],
+		onEvents: {
+			foo: function( e ){
+				console.log( 'The parent detected a foo event!' );
+			},
+			bar: 'onBar'
+		},
+		render: function(){
+			return (
+				<div className="parent">
+					<Child />
+				</div>
+			);
+		},
+		bar: 'bar',
+		onBar: function(){
+			console.log( 'The parent detected a ' + this.bar + ' event!' );
+		}
+	});
+
+	var Child = React.createClass({
+		mixins: [ Reactions.mixin ],
+		render: function(){
+			return (
+				<div className="child">
+					<button onClick={ this.thenTrigger('foo') }>Foo event</button>
+					<button onClick={ this.thenTrigger('foo', "Foo!") }>Foo with detail</button>
+					<button onClick={ this.onBar }>Bar event</button>
+					<button onClick={ this.onBarDetail }>Bar with detail</button>
+				</div>
+			);
+		},
+		onBar: function(){
+			this.trigger( 'bar' );
+		},
+		onBarDetail: function(){
+			this.trigger( 'bar', 'Bar!!' );
+		}
+	});
+
+	Reactions.on( 'foo', function( e ){
+		console.log( 'foo reaction. Detail:' + e.detail );
+	});
+	Reactions.once( 'foo', function( e ){
+		console.log( 'This foo reaction is triggered just once' );
+	});
+	Reactions.on( 'bar', function( e ){
+		console.log( 'bar reaction. Detail:' + e.detail );
+	});
+	Reactions.once( 'bar', function( e ){
+		console.log( 'This bar reaction is triggered just once' );
+	});
+
+	React.render( <Parent />, document.body );
+</script>
+
+</body>
+</html>
