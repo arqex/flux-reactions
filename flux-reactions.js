@@ -1,7 +1,7 @@
-/* flux-reactions v0.0.1 (24-2-2015)
+/* flux-reactions v0.0.2 (26-3-2015)
  * https://github.com/arqex/flux-reactions.git
  * By arqex
- * License: GNU-v2
+ * License: MIT
  */
 ( function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -47,6 +47,46 @@
 			delete node[ 'on' + eventName ];
 	};
 
+	/**
+	 * Triggers a DOM event in the given DOM node
+	 * @param {HTMLElement} node The HTML node where the event is triggered.
+	 * @param  {String} eventName The event type
+	 * @param  {Mixed} detail    The detail attribute for the event, to add
+	 *                           some extra data to the event.
+	 * @return {Event}           The event triggered
+	 */
+	var trigger = function( node, eventName, detail ){
+		var el = node,
+			e
+		;
+
+		if( document.createEvent ){
+			e = document.createEvent( 'HTMLEvents' );
+			e.initEvent( eventName, true, true );
+		}
+		else if( document.createEventObject ){ // IE < 9
+			e = document.createEventObject();
+			e.eventType = eventName;
+		}
+
+		e.detail = detail;
+
+		if( el.dispatchEvent ){
+			var result = el.dispatchEvent( e );
+		}
+		else if( el.fireEvent && htmlEvents[ 'on' + eventName ] ){ // IE < 9
+			el.fireEvent( 'on' + eventName, e ); // can trigger only real event (e.g. 'click')
+		}
+		else if( el[ eventName ] ){
+			el[ eventName ]();
+		}
+		else if( el[ 'on' + eventName ]) {
+			el[ 'on' + eventName ]();
+		}
+
+		return e;
+	};
+
 	// The module that will be plublicly available
 	var Reactions = {
 
@@ -89,6 +129,18 @@
 		},
 
 		/**
+		 * Triggers a DOM event in the hub
+		 * @param  {String} eventName The event type
+		 * @param  {Mixed} detail    The detail attribute for the event, to add
+		 *                           some extra data to the event.
+		 * @return {this}             To chain calls
+		 */
+		trigger: function( eventName, fn ){
+			trigger( hub, eventName, fn );
+			return this;
+		},
+
+		/**
 		 * A mixin to be used with react components.
 		 * @type {Object}
 		 */
@@ -101,35 +153,7 @@
 			 * @return {Event}           The event triggered
 			 */
 			trigger: function( eventName, detail ){
-				var el = this.getDOMNode(),
-					e
-				;
-
-				if( document.createEvent ){
-					e = document.createEvent( 'HTMLEvents' );
-					e.initEvent( eventName, true, true );
-				}
-				else if( document.createEventObject ){ // IE < 9
-					e = document.createEventObject();
-					e.eventType = eventName;
-				}
-
-				e.detail = detail;
-
-				if( el.dispatchEvent ){
-					var result = el.dispatchEvent( e );
-				}
-				else if( el.fireEvent && htmlEvents[ 'on' + eventName ] ){ // IE < 9
-					el.fireEvent( 'on' + eventName, e ); // can trigger only real event (e.g. 'click')
-				}
-				else if( el[ eventName ] ){
-					el[ eventName ]();
-				}
-				else if( el[ 'on' + eventName ]) {
-					el[ 'on' + eventName ]();
-				}
-
-				return e;
+				return trigger( this.getDOMNode(), eventName, detail );
 			},
 
 			/**
@@ -184,7 +208,7 @@
 					if( typeof listener != 'function' )
 						listener = this[listener];
 
-					this.listenTo( eventName, listener );
+					this.listenTo( eventName, listener.bind( this ) );
 				}
 			}
 		}

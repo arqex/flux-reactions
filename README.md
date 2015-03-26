@@ -85,6 +85,68 @@ var Item = React.createClass({
 })
 ```
 
+## API
+### Reactions.on( eventName, callback )
+Add a listener to some event, AKA creates a reaction. The reaction will receive the event as the only argument.
+```js
+// Creates a reaction for the selected event
+Reactions.on( 'selected', function( e ){
+    console.log( 'Hey I am selected!');
+});
+```
+### Reactions.once( eventName, callback )
+Add a listener to some events that will be called just once.
+
+### Reactions.off( eventName, callback )
+Removes an event listener.
+
+### Reactions.trigger( eventName, detail )
+Flux dispatcher uses the `waitfor` method to synchronize different actions. Using flux-reaction you can trigger a new event whenever a reaction has finished to coordinate several reactions for an event.
+
+### Reactions.mixin
+A mixin to be used by react components. The mixin will add the following methods to the component:
+
+#### trigger( eventName, detail )
+Triggers the event in the DOM node of the component. The detail attribute of the event can be customized passing its value as the second argument.
+
+#### thenTrigger( eventName, detail )
+Returns a function than trigger the event with the given detail attribute. This is useful to trigger the event directly from the render method without creating a new function that does so.
+```js
+var Item = React.createClass({
+    mixin:[Reactions.mixin],
+    render: function(){
+        return (
+            // thenTrigger will emit a selected event on click
+            <div onClick={ this.thenTrigger( 'selected', this.props.index ) }>
+                { this.props.text }
+            </div>
+        );
+    }
+})
+```
+
+#### listenTo( eventName, callback )
+Listen to children events.
+
+#### onEvents
+Event listeners for children can also defined declaratively by using the
+component  `onEvents` attribute. That attribute must be an object with
+the name of the events as keys and functions or name of methods of the
+current component as values:
+```js
+onEvents: {
+    selected: 'onSelected',
+    removed: function(){
+        console.log( 'removed' );
+    }
+}
+```
+
+A selected event on a children with trigger component's `onSelected` method.
+A removed event will trigger the function defined.
+
+Those listeners will be added in this componentDidMount method.
+
 ## Collaborate
 This is a quick implementation of a crossbrowser event library to be used with React.js. There are some directions to work to:
 * Add support for using EventEmitter make it work in the server.

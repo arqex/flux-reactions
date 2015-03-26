@@ -1,6 +1,6 @@
 {
   "name": "flux-reactions",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An event driven Flux implementation.",
   "main": "flux-reactions.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "Events"
   ],
   "author": "Javi Marquez",
-  "license": "GNU-v2",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/arqex/flux-reactions/issues"
   },
