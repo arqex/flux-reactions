@@ -25,7 +25,7 @@ Or adding it directly to your page code for development [flux-reactions.js](http
 ```js
 var Counter  = React.createClass({
     // Add the reaction mixin
-    mixin: [Reactions.mixin],
+    mixins: [Reactions.mixin],
     render: function(){
         return (
             <div className="counter">
@@ -52,7 +52,7 @@ Reactions.on( 'increase', function( e ){
 The mixin also allow to listen to events emited by children components. Imagine a selectable list:
 ```js
 var List = React.createClass({
-    mixin:[Reactions.mixin],
+    mixins:[Reactions.mixin],
     // Events to listen are defined in the onEvents attribute
     onEvents: {
         // Add a listener to the selected event
@@ -73,7 +73,7 @@ var List = React.createClass({
     }
 });
 var Item = React.createClass({
-    mixin:[Reactions.mixin],
+    mixins:[Reactions.mixin],
     render: function(){
         return (
             // thenTrigger will emit a selected event on click
@@ -113,7 +113,7 @@ Triggers the event in the DOM node of the component. The detail attribute of the
 Returns a function than trigger the event with the given detail attribute. This is useful to trigger the event directly from the render method without creating a new function that does so.
 ```js
 var Item = React.createClass({
-    mixin:[Reactions.mixin],
+    mixins:[Reactions.mixin],
     render: function(){
         return (
             // thenTrigger will emit a selected event on click
